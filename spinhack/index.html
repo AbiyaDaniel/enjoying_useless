@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Friendly Project Picker 🎡</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet" />
+  <style>
+    body, html {
+      margin: 0; padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #ffedf0, #e0f7fa);
+      color: #4a2c4d;
+      overflow-x: hidden;
+    }
+    .page {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+    .active {
+      display: flex;
+    }
+    video {
+      width: 300px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    h1, h2 {
+      margin: 10px 0;
+    }
+    button {
+      background-color: #ff4081;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 30px;
+      margin: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #d81b60;
+    }
+    canvas {
+      border-radius: 50%;
+      width: 400px;
+      height: 400px;
+      margin: 20px 0;
+    }
+    #spinLayout {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+    #wheelCenter {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #leftResult, #rightQuestion {
+      max-width: 300px;
+    }
+    #descriptionBox {
+      background: #fff0f5;
+      padding: 30px;
+      border-radius: 16px;
+      font-size: 22px;
+      font-weight: bold;
+      text-align: center;
+      width: 100%;
+    }
+    #rightQuestion {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #rightQuestion h3 {
+      font-size: 24px;
+      margin-top: 0;
+    }
+    #rightQuestion button {
+      font-size: 16px;
+      padding: 10px 24px;
+      margin: 10px;
+      border-radius: 50px;
+    }
+    #customInputSection {
+      margin-top: 15px;
+      display: none;
+    }
+    #customInputSection input[type="text"] {
+      padding: 8px;
+      border: 2px solid #ff4081;
+      border-radius: 20px;
+      width: 90%;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    /* Page 3 styles */
+    #page3 h1 {
+      font-size: 48px;
+      animation: bounce 1s infinite;
+      color: #ff4081;
+      margin-bottom: 20px;
+    }
+    #page3 p {
+      font-size: 20px;
+      max-width: 600px;
+      margin-bottom: 30px;
+      color: #4a2c4d;
+    }
+    #page3 .btn-group {
+      position: relative;
+      width: 100%;
+      height: 120px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #page3 .btn-group button {
+      background-color: #ff4081;
+      padding: 15px 40px;
+      font-size: 18px;
+      border-radius: 50px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      color: white;
+      border: none;
+    }
+    #page3 .btn-group button:hover {
+      background-color: #d81b60;
+      transform: scale(1.1);
+    }
+    #noBtnPage3 {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    /* Confetti canvas */
+    #confettiCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Page 1 -->
+<div id="page1" class="page active">
+  <video autoplay muted loop>
+    <source src="animations/teddy_wave.mp4" type="video/mp4" />
+  </video>
+  <h1>👋 Hey buddy!</h1>
+  <p>Feeling stuck with useless project ideas? 😅<br>No worries! I’m here to bring a little sparkle ✨</p>
+  <button onclick="showPage('page2')">🎯 Let’s Go!</button>
+</div>
+
+<!-- Page 2 -->
+<div id="page2" class="page">
+  <div id="spinLayout">
+    <div id="leftResult">
+      <div id="descriptionBox">🎁 Topic will show here...</div>
+    </div>
+    <div id="wheelCenter">
+      <h1 style="font-size: 42px;">🎡 Spin the Wheel of Wonders!</h1>
+      <canvas id="wheelCanvas" width="400" height="400"></canvas>
+      <button onclick="spin()">🔄 Spin the Wheel</button>
+    </div>
+    <div id="rightQuestion">
+      <h3>Do you like this topic?</h3>
+      <div>
+        <button onclick="showPage('page3')">👍 Yes</button>
+        <button onclick="showCustomInput()">❌ No</button>
+      </div>
+      <div id="customInputSection">
+        <p>📝 Type your favorite topic and short description:</p>
+        <input type="text" id="customTopic" placeholder="Your favorite topic..." />
+        <button onclick="useCustomTopic()">🎡 Spin with My Topic</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Page 3 -->
+<div id="page3" class="page">
+  <h1>🎉 Happy friendship Day 🎉</h1>
+  <p id="finalTopicText" style="font-weight: bold; font-size: 28px;"></p>
+  <h4>Sherikum 😔 Friendship Day aanu 🎉💛<br>
+Vazhakk aayi erikuna nammal kannu 😤👉😔<br>
+Sherikum ninnodu mindathe erikan pattilla daa 🥺💔<br>
+Sherikum nee... sherikum ente good good good friend aanu 🤗❤️🤗<br>
+Okk... sherikum BEST FRIEND 🫂🌟<br>
+But ennalathinu... sorry 🙏😞<br>
+Pinne ethra nallathu kude ninna thinnu... THANKUUUUUUUU 🥹🤍✨<br>
+Sherikum nee help cheythathinu 🤝💪<br>
+Vazhakk kudiyathinum 😅😠🙈<br>
+Concern kaanichathinum 👀💭❤️<br>
+Ellathinum... THANKUUUUUUUUU 🥹🌈🎁<br>
+Myyyyyyyyyyyy BROOOOOOOOOOOOOOOOOOOOO 🧿🔥🫶👊💯💥🙌<br>
+  </h4>
+  <h1>Nee enne mindumodaaaaa</h1>
+  <div class="btn-group">
+    <button id="yesBtnPage3">👍 Yes</button>
+    <button id="noBtnPage3">❌ No</button>
+  </div>
+  <canvas id="confettiCanvas"></canvas>
+</div>
+
+<script>
+  const topics = [
+    { title: "Procrastinators", description: "🧘A to-do list, but for things you absolutely shouldn’t do (but might)." },
+    { title: "Overthink Simulator", description: "🧠Type something. It shows 35 possible interpretations." },
+    { title: "Internet Speed Humiliator", description: "🐌If your net is slow, it plays dramatic sad music and displays a turtle crying." },
+    { title: "Reverse Typing Website", description: "🔁You type a word, but the letters appear in reverse order, upside down, or jumbled." },
+    { title: "Mood Bloom ", description: "🌸Emotional Flower,Your mood causes a flower to bloom, wilt, or die" },
+    { title: "AntiSpire", description: "🙃 A quote app that tells you why you’ll never succeed.." },
+    { title: "CursedTyper", description: "👹 “Letters come out reversed, sideways, or with random emojis." },
+    { title: "SlapClock", description: "👋An alarm that only stops if you violently click the screen (or shake phone)." },
+    { title: " Emojinal Support Bot", description: "😢You type how you’re feeling in one word, and the site responds with a giant, overly dramatic emoji… and nothing else." }
+  ];
+
+  const canvas = document.getElementById('wheelCanvas');
+  const ctx = canvas.getContext('2d');
+  const radius = canvas.width / 2;
+  let rotation = 0;
+  let selectedTopic = null;
+  let extendedTopics = [...topics];
+  const colors = ["#ff9aa2","#ffb7b2","#ffdac1","#e2f0cb","#b5ead7","#c7ceea","#f8bbd0","#f48fb1"];
+
+  function drawWheel(list = extendedTopics) {
+    const anglePerSlice = 2 * Math.PI / list.length;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < list.length; i++) {
+      let start = i * anglePerSlice;
+      let end = start + anglePerSlice;
+      ctx.beginPath();
+      ctx.moveTo(radius, radius);
+      ctx.arc(radius, radius, radius, start, end);
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fill();
+      ctx.save();
+      ctx.translate(radius, radius);
+      ctx.rotate(start + anglePerSlice / 2);
+      ctx.fillStyle = "#333";
+      ctx.font = "bold 14px Arial";
+      ctx.textAlign = "right";
+      ctx.fillText(list[i].title, radius - 10, 5);
+      ctx.restore();
+    }
+  }
+
+  drawWheel();
+
+  function spin() {
+    const spins = 6;
+    const randomDeg = Math.floor(Math.random() * 360);
+    const totalDeg = spins * 360 + randomDeg;
+    rotation += totalDeg;
+    canvas.style.transition = "transform 4s ease-out";
+    canvas.style.transform = `rotate(${rotation}deg)`;
+
+    document.getElementById("rightQuestion").style.display = "none";
+    document.getElementById("customInputSection").style.display = "none";
+
+    setTimeout(() => {
+      const normalized = rotation % 360;
+      const anglePerSlice = 360 / extendedTopics.length;
+      const index = Math.floor((360 - normalized + anglePerSlice / 2) % 360 / anglePerSlice);
+      selectedTopic = extendedTopics[index];
+      document.getElementById("descriptionBox").innerText = `🎯 ${selectedTopic.title}\n${selectedTopic.description}`;
+      document.getElementById("rightQuestion").style.display = "flex";
+    }, 4200);
+  }
+
+  function showCustomInput() {
+    document.getElementById("customInputSection").style.display = "block";
+  }
+
+  function useCustomTopic() {
+    const input = document.getElementById("customTopic").value.trim();
+    const descInput = document.getElementById("customDesc").value.trim() || "🎯 Your custom project idea!";
+    if (!input) return alert("Please enter a topic!");
+    const found = extendedTopics.find(t => t.title.toLowerCase() === input.toLowerCase());
+    if (!found) {
+      extendedTopics.push({ title: input, description: descInput });
+      drawWheel(extendedTopics);
+    }
+    const index = extendedTopics.findIndex(t => t.title.toLowerCase() === input.toLowerCase());
+    const anglePerSlice = 360 / extendedTopics.length;
+    const landingAngle = 360 - (index * anglePerSlice) - anglePerSlice / 2;
+    const spins = 6;
+    const totalDeg = spins * 360 + landingAngle;
+    rotation += totalDeg;
+    canvas.style.transition = "transform 4s ease-out";
+    canvas.style.transform = `rotate(${rotation}deg)`;
+    document.getElementById("rightQuestion").style.display = "none";
+    document.getElementById("customInputSection").style.display = "none";
+    setTimeout(() => {
+      selectedTopic = extendedTopics[index];
+      document.getElementById("descriptionBox").innerText = `🎯 ${selectedTopic.title}\n${selectedTopic.description}`;
+      document.getElementById("rightQuestion").style.display = "flex";
+    }, 4200);
+  }
+
+  function showPage(id) {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    if (id === "page3") {
+      if (!selectedTopic) return showPage('page2');
+      document.getElementById("finalTopicText").innerText = "";
+      launchConfetti();
+    }
+  }
+
+  function launchConfetti() {
+    const canvas = document.getElementById("confettiCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const confetti = Array.from({length: 150}, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      r: Math.random() * 6 + 4,
+      d: Math.random() * 0.5 + 0.5,
+      color: `hsl(${Math.random() * 360}, 100%, 70%)`
+    }));
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach(c => {
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, c.r, 0, 2 * Math.PI);
+        ctx.fillStyle = c.color;
+        ctx.fill();
+      });
+      update();
+    }
+    function update() {
+      confetti.forEach(c => {
+        c.y += c.d * 6;
+        if (c.y > canvas.height) {
+          c.y = -10;
+          c.x = Math.random() * canvas.width;
+        }
+      });
+    }
+    function animate() {
+      draw();
+      requestAnimationFrame(animate);
+    }
+    animate();
+  }
+
+  document.getElementById("yesBtnPage3").addEventListener("click", () => {
+    alert("Sorry a lot daa for being hyper 🥹");
+  });
+
+  const noBtn = document.getElementById("noBtnPage3");
+  const btnGroup = document.querySelector(".btn-group");
+
+  btnGroup.addEventListener("mousemove", (e) => {
+    const btnRect = noBtn.getBoundingClientRect();
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+    const btnX = btnRect.left + btnRect.width / 2;
+    const btnY = btnRect.top + btnRect.height / 2;
+    const dx = mouseX - btnX;
+    const dy = mouseY - btnY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    if (distance < 100) {
+      const offsetX = (Math.random() - 0.5) * 200;
+      const offsetY = (Math.random() - 0.5) * 100;
+      let newLeft = noBtn.offsetLeft + offsetX;
+      let newTop = noBtn.offsetTop + offsetY;
+      const maxLeft = btnGroup.offsetWidth - noBtn.offsetWidth;
+      const maxTop = btnGroup.offsetHeight - noBtn.offsetHeight;
+      newLeft = Math.max(0, Math.min(maxLeft, newLeft));
+      newTop = Math.max(0, Math.min(maxTop, newTop));
+      noBtn.style.left = `${newLeft}px`;
+      noBtn.style.top = `${newTop}px`;
+    }
+  });
+</script>
+
+</body>
+</html>   can you make sorry daa for being hyper that one please convert it to a text box full code
